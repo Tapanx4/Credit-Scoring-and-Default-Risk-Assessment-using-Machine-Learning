@@ -1,0 +1,33 @@
+# --- Global ---
+.DS_Store
+*.log
+
+# --- Backend (Python) ---
+backend/__pycache__/
+backend/*.py[cod]
+backend/venv/
+backend/env/
+backend/.env
+backend/.pytest_cache/
+
+# Ignore heavy ML Artifacts (Optional: Use Git LFS if you want to track them)
+backend/artifacts/*.cbm
+backend/artifacts/*.keras
+backend/artifacts/*.pkl
+
+# --- Frontend (Node) ---
+frontend/node_modules/
+frontend/build/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+
+# --- IDEs ---
+.vscode/
+.idea/

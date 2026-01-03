@@ -1,0 +1,25 @@
+from enum import Enum
+
+class DeclineReason(str, Enum):
+    """
+    Standardized codes for Adverse Action Notices.
+    """
+    # Policy Hard Knockouts
+    RISK_CUTOFF = "RISK_CUTOFF_EXCEEDED"
+    NEGATIVE_EV = "NEGATIVE_EXPECTED_VALUE"
+    PRICING_CAP = "PRICING_CAP_REACHED"
+    STRESS_TEST_FAIL = "FAILED_STRESS_TEST"
+    
+    # Data Issues
+    INSUFFICIENT_DATA = "INSUFFICIENT_CREDIT_HISTORY"
+    INVALID_INPUT = "INVALID_APPLICATION_DATA"
+    
+    # Specific Feature Drivers (If you implement SHAP logic later)
+    HIGH_DTI = "EXCESSIVE_DEBT_TO_INCOME"
+    HIGH_UTILIZATION = "HIGH_CREDIT_UTILIZATION"
+    RECENT_DELINQUENCY = "RECENT_DELINQUENCY"
+    LOW_INCOME = "INSUFFICIENT_INCOME"
+    
+    # Manual
+    UNDERWRITER_DISCRETION = "UNDERWRITER_DISCRETION"
+    FRAUD_SUSPICION = "FRAUD_SUSPICION"
