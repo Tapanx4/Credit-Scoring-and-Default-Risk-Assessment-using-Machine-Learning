@@ -1,71 +1,9 @@
-# # =============================================================
-# # api/v1/applications.py — FIXED & HARDENED
-# # =============================================================
-# from fastapi import APIRouter, Depends, HTTPException, status
-# from sqlalchemy.orm import Session
-# import uuid
-# from typing import List
-
-# from app.api.deps import get_db
-# from app.auth.dependencies import get_current_user
-# from app.services.application_service import ApplicationService
-# from app.models.schemas.application import ApplicationCreate, ApplicationResponse
-
-# router = APIRouter()
-
-
-# @router.post("/", response_model=ApplicationResponse, status_code=status.HTTP_201_CREATED)
-# def submit_application(
-#     payload: ApplicationCreate,
-#     db: Session = Depends(get_db),
-#     user=Depends(get_current_user),
-# ):
-#     """
-#     Submit a new loan application.
-#     - Creates application (CREATED)
-#     - Submits & scores immediately
-#     """
-#     service = ApplicationService(db)
-
-#     app = service.create_application(payload, user_id=str(user.id))
-#     return service.submit_and_score(app.id)
-
-
-# @router.get("/{application_id}", response_model=ApplicationResponse)
-# def get_application(
-#     application_id: uuid.UUID,
-#     db: Session = Depends(get_db),
-#     user=Depends(get_current_user),
-# ):
-#     """Fetch a single application with ownership enforcement."""
-#     service = ApplicationService(db)
-#     app = service.get_application_by_id(application_id)
-
-#     role = user.user_metadata.get("role", "applicant")
-#     if role == "applicant" and str(app.user_id) != str(user.id):
-#         raise HTTPException(status_code=403, detail="Not authorized")
-
-#     return app
-
-
-# @router.get("/", response_model=List[ApplicationResponse])
-# def list_my_applications(
-#     db: Session = Depends(get_db),
-#     user=Depends(get_current_user),
-# ):
-#     """List applications for the current user."""
-#     service = ApplicationService(db)
-#     role = user.user_metadata.get("role", "applicant")
-
-#     if role == "applicant":
-#         return service.list_applications_for_user(user_id=str(user.id))
-
-#     return service.list_recent_applications(limit=50)
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 import uuid
 from typing import List
-
+from fastapi import Body
+from app.auth.permissions import require_role
 from app.api.deps import get_db
 from app.auth.dependencies import get_current_user
 from app.services.application_service import ApplicationService
@@ -74,7 +12,27 @@ from app.models.db.application import Application  # Moved to top level
 
 router = APIRouter()
 # --- DECISION ACTIONS (Moved here so URL is /applications/{id}/accept) ---
+@router.post("/{application_id}/documents", response_model=ApplicationResponse)
+def upload_document(
+    application_id: uuid.UUID,
+    document: dict = Body(...), # {name, url, type}
+    db: Session = Depends(get_db),
+    user = Depends(get_current_user)
+):
+    """
+    Attach a document reference to an application.
+    """
+    # Verify access (Applicant can upload to own, Staff can upload to any)
+    service = ApplicationService(db)
+    app = service.get_application_by_id(application_id)
+    user_role = user.app_metadata.get("role", "applicant")
+    
+    if user_role == "applicant" and str(app.user_id) != str(user.id):
+        raise HTTPException(status_code=403, detail="Not authorized")
 
+    return ApplicationResponse.from_orm(
+        service.attach_document(application_id, document, str(user.id))
+    )
 @router.post("/{application_id}/accept", response_model=ApplicationResponse)
 def accept_offer(
     application_id: uuid.UUID,
@@ -217,3 +175,66 @@ def list_my_applications(
     
     # FIX: Explicit mapping for list
     return [ApplicationResponse.from_orm(a) for a in apps]
+@router.post("/{application_id}/documents", response_model=ApplicationResponse)
+def upload_document(
+    application_id: uuid.UUID,
+    document: dict = Body(..., description="File metadata: {name, url, type}"),
+    db: Session = Depends(get_db),
+    user = Depends(get_current_user)
+):
+    """
+    Attach a document reference to an application.
+    """
+    service = ApplicationService(db)
+    
+    # Auth check
+    app = service.get_application_by_id(application_id)
+    user_role = user.app_metadata.get("role", "applicant")
+    if user_role == "applicant" and str(app.user_id) != str(user.id):
+        raise HTTPException(status_code=403, detail="Not authorized")
+
+    try:
+        updated_app = service.attach_document(application_id, document, actor_id=str(user.id))
+        return ApplicationResponse.from_orm(updated_app)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+@router.post("/{application_id}/request-documents", response_model=ApplicationResponse)
+def request_documents(
+    application_id: uuid.UUID,
+    db: Session = Depends(get_db),
+    user = Depends(get_current_user)
+):
+    require_role(user, ["underwriter", "admin"]) # Only staff can request
+    service = ApplicationService(db)
+    try:
+        return ApplicationResponse.from_orm(
+            service.request_documents(application_id, str(user.id))
+        )
+    except Exception as e:
+        import traceback
+        print("\n🔥 REQUEST DOCUMENTS ERROR 🔥")
+        traceback.print_exc()
+
+        raise HTTPException(
+            status_code=400,
+            detail=str(e)
+        )
+@router.post("/{application_id}/fund", response_model=ApplicationResponse)
+def fund_application(
+    application_id: uuid.UUID,
+    db: Session = Depends(get_db),
+    user = Depends(get_current_user)
+):
+    """
+    Admin action: Fund a loan.
+    Transition: ACCEPTED -> FUNDED
+    """
+    # Only Admins can disburse funds
+    require_role(user, ["admin"])
+    
+    service = ApplicationService(db)
+    try:
+        updated_app = service.fund_application(application_id, actor_id=str(user.id))
+        return ApplicationResponse.from_orm(updated_app)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))

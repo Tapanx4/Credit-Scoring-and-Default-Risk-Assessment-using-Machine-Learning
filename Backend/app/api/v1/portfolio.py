@@ -3,6 +3,7 @@
 # =============================================================
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
+from typing import Optional, List
 
 from app.api.deps import get_db
 from app.auth.dependencies import get_current_user
@@ -32,12 +33,32 @@ def get_tier_distribution(
     return PortfolioService(db).get_tier_distribution()
 
 
+# @router.get("/activity")
+# def get_recent_activity(
+#     limit: int = 20,
+#     offset: int = 0,
+#     search: str = None,
+#     db: Session = Depends(get_db),
+#     user = Depends(get_current_user)
+# ):
+#     """
+#     Live feed with Search & Pagination.
+#     """
+#     require_role(user, ["admin", "underwriter"])
+#     service = PortfolioService(db)
+#     return service.get_recent_activity(limit=limit, offset=offset, search=search)
 @router.get("/activity")
 def get_recent_activity(
     limit: int = 20,
+    offset: int = 0,
+    search: Optional[str] = None, # <--- ADDED THIS PARAMETER
     db: Session = Depends(get_db),
-    user=Depends(get_current_user),
+    user = Depends(get_current_user)
 ):
-    """Live feed of recent application activity."""
-    require_role(user, ["admin", "underwriter", "cro"])
-    return PortfolioService(db).get_recent_activity(limit)
+    """
+    Live feed of applications with optional search.
+    """
+    require_role(user, ["admin", "underwriter"])
+    service = PortfolioService(db)
+    # Pass search to service
+    return service.get_recent_activity(limit=limit, offset=offset, search=search)

@@ -1,0 +1,61 @@
+
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.log
+
+# ===========================
+
+# BACKEND (Python / Render)
+
+# ===========================
+
+backend/pycache/
+backend/*.py[cod]
+backend/venv/
+backend/.venv/
+backend/env/
+
+🔒 SECURITY: Never upload backend secrets
+
+backend/.env
+
+
+
+backend/.pytest_cache/
+backend/htmlcov/
+backend/.coverage
+
+# ===========================
+
+# FRONTEND (Node / Vercel)
+
+# ===========================
+
+frontend/node_modules/
+
+# Logs
+
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+
+# 🔒 SECURITY: Never upload frontend secrets
+
+frontend/.env
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+
+# Build Outputs (Covers both Vite 'dist' and CRA 'build')
+
+frontend/dist/
+frontend/build/
+
+# Vercel Deployment Cache
+
+frontend/.vercel/

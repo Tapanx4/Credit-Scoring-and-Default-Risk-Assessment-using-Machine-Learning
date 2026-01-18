@@ -1,49 +1,39 @@
-# app/core/economics/pricing.py
 
 from typing import Final, Tuple
 import math
 
-BASE_RATE: Final[float] = 8.0          # Reference / prime rate
-LEGAL_APR_CAP: Final[float] = 36.0     # Regulatory hard stop
-PRODUCT_APR_CAP: Final[float] = 28.0   # Business / reputation cap
-PRICING_SLOPE: Final[float] = 18.0     # Tunable risk sensitivity
+BASE_RATE: Final[float] = 9.5
+LEGAL_APR_CAP: Final[float] = 36.0
+PRODUCT_APR_CAP: Final[float] = 28.0
+
+MAX_SPREAD: Final[float] = 35.0   # max risk premium
+ALPHA: Final[float] = 1.5         # curvature control
 
 
 def get_risk_based_pricing(pd: float) -> Tuple[float, bool]:
-    """
-    Returns:
-        apr (float): Final APR to display / price at
-        hit_product_cap (bool): True if applicant should be declined
-                                 due to excessive risk
-    """
     # -----------------------------
     # 1. Validate PD
     # -----------------------------
-    # Normalize PD if model outputs percentage
     if pd > 1:
-        pd = pd / 100
-    if pd < 0.0 or pd > 1.0:
+        pd /= 100
+    if not 0.0 <= pd <= 1.0:
         raise ValueError("PD must be between 0 and 1")
 
     # -----------------------------
-    # 2. Smooth, monotonic pricing
+    # 2. Smooth power-based pricing
     # -----------------------------
-    raw_spread = PRICING_SLOPE * math.log1p(pd * 10)
+    raw_spread = MAX_SPREAD * (pd ** ALPHA)
     apr = BASE_RATE + raw_spread
 
     # -----------------------------
-    # 3. Hard legal protection
+    # 3. Legal cap
     # -----------------------------
     apr = min(apr, LEGAL_APR_CAP)
 
     # -----------------------------
-    # 4. Product-level rule
+    # 4. Product rule
     # -----------------------------
     hit_product_cap = apr > PRODUCT_APR_CAP
-
-    # Clamp APR to product cap for consistency
     apr = min(apr, PRODUCT_APR_CAP)
 
     return round(apr, 2), hit_product_cap
-    
-    

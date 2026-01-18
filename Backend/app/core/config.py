@@ -16,8 +16,9 @@ class Settings(BaseSettings):
     SUPABASE_SERVICE_ROLE_KEY: str 
     SUPABASE_JWT_SECRET: str
     ARTIFACTS_DIR: Path = Path("artifacts")
-    MAX_PD_CUTOFF: float = 0.30          
-    MIN_PROFIT_BUFFER: float = 50.0   
+    MAX_PD_CUTOFF: float = 0.50          
+    MIN_PROFIT_BUFFER: float = 250.0
+    LGD_ASSUMPTION: float = 0.1  
     class Config:
         env_file = ".env"
         extra = "forbid"  # explicit & intentional

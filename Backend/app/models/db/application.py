@@ -1,74 +1,3 @@
-
-# # =============================================================
-# # models/db/application.py — ENUM SAFE (FIXED)
-# # =============================================================
-# from sqlalchemy import Column, String, Float, Integer, DateTime, Enum, JSON
-# from sqlalchemy.orm import relationship
-# from sqlalchemy.dialects.postgresql import UUID
-# import uuid
-# from datetime import datetime
-
-# from app.db.base import Base
-# from app.core.lifecycle.states import ApplicationStatus, RiskTier
-
-
-# class Application(Base):
-#     """
-#     Master record for a loan application.
-#     Stores lifecycle state, latest risk snapshot, and economics.
-#     """
-
-#     __tablename__ = "applications"
-
-#     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-#     user_id = Column(String, index=True, nullable=True)
-
-#     input_data = Column(JSON, nullable=False)
-
-#     status = Column(
-#         Enum(
-#             ApplicationStatus,
-#             values_callable=lambda x: [e.value for e in x],
-#         ),
-#         default=ApplicationStatus.CREATED,
-#         nullable=False,
-#         index=True,
-#     )
-
-#     current_tier = Column(
-#         Enum(
-#             RiskTier,
-#             values_callable=lambda x: [e.value for e in x],
-#         ),
-#         nullable=True,
-#     )
-
-#     credit_score = Column(Integer, nullable=True)
-#     pd_raw = Column(Float, nullable=True)
-
-#     expected_value = Column(Float, nullable=True)
-#     pricing_apr = Column(Float, nullable=True)
-#     approved_amount = Column(Float, nullable=True)
-
-#     primary_decline_reason = Column(String, nullable=True)
-#     secondary_decline_reasons = Column(JSON, nullable=True)
-
-#     created_at = Column(DateTime, default=datetime.utcnow)
-#     submitted_at = Column(DateTime, nullable=True)
-#     decisioned_at = Column(DateTime, nullable=True)
-#     funded_at = Column(DateTime, nullable=True)
-
-#     decisions = relationship(
-#         "Decision",
-#         back_populates="application",
-#         cascade="all, delete-orphan",
-#     )
-
-#     audit_logs = relationship(
-#         "AuditLog",
-#         back_populates="application",
-#         cascade="all, delete-orphan",
-#     )
 from sqlalchemy import Column, String, Float, Integer, DateTime, Enum, JSON, text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
@@ -118,6 +47,9 @@ class Application(Base):
     # --- Relationships (Fixes InvalidRequestError) ---
     decisions = relationship("Decision", back_populates="application", cascade="all, delete-orphan")
     audit_logs = relationship("AuditLog", back_populates="application", cascade="all, delete-orphan")
+    # NEW: Documents Store
+    # Stores list of { "name": "paystub.pdf", "url": "...", "uploaded_at": "..." }
+    documents = Column(JSON, nullable=True, default=list)
 
     # ---------------------------------------------------------
     # VIRTUAL PROPERTIES
