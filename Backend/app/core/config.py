@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     BACKEND_CORS_ORIGINS: List[str] = [
         "http://localhost:3000", 
         "http://localhost:8000",
-        "*" 
+        "https://credit-scoring-and-default-risk-ass.vercel.app/" 
     ]
     # --- Infrastructure ---
     DATABASE_URL: str
