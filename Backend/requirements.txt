@@ -17,37 +17,48 @@
 # supabase>=2.3.0
 # httpx>=0.26.0
 # python-dotenv>=1.0.0
---- Core API ---
 
-fastapi>=0.109.0
-uvicorn[standard]>=0.27.0
-python-multipart>=0.0.9
-pydantic>=2.6.0
-pydantic-settings>=2.2.0
+# ----------------------------
+# Core API stack
+# ----------------------------
+fastapi==0.110.0
+uvicorn==0.27.1
+pydantic==2.6.4
+pydantic-settings==2.2.1
+email-validator==2.1.1
 
---- Database ---
+# ----------------------------
+# Database & migrations
+# ----------------------------
+sqlalchemy==2.0.25
+alembic==1.13.1
+psycopg2==2.9.9
 
-sqlalchemy>=2.0.25
-alembic>=1.13.1
-psycopg2-binary>=2.9.9
-supabase>=2.3.0
+# ----------------------------
+# Data & ML (PINNED TO TRAINING)
+# ----------------------------
+numpy==1.26.4
+pandas==2.1.4
+scikit-learn==1.6.1
+catboost==1.2.8
 
---- Machine Learning & Data ---
-
-numpy>=1.26.0
-pandas>=2.2.0
-scikit-learn>=1.4.0
-catboost>=1.2.2
-
---- STABILITY FIXES ---
-
-Pin TF and Protobuf to known stable compatible versions
-
-tensorflow-cpu==2.15.0
+# ----------------------------
+# Neural network stack (CRITICAL)
+# ----------------------------
+tensorflow==2.15.0
+keras==3.10.0
 protobuf==3.20.3
 
---- Utilities ---
+# ----------------------------
+# Auth & security
+# ----------------------------
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
 
-python-dotenv>=1.0.0
-httpx>=0.26.0
-email-validator>=2.1.0
+# ----------------------------
+# Misc / utilities
+# ----------------------------
+python-multipart==0.0.9
+httpx==0.26.0
+python-dotenv==1.0.1
+supabase==2.3.5
