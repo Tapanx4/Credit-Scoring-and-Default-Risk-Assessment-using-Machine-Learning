@@ -4,7 +4,9 @@ FROM python:3.10-slim
 USER root
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
+    libpq-dev \
     && rm -rf /var/lib/apt/lists/*
+
 
 # 2. Create User 1000 (Required by Hugging Face)
 RUN useradd -m -u 1000 user
