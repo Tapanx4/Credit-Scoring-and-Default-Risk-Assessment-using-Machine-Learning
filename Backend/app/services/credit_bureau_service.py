@@ -69,7 +69,7 @@ class CreditBureauService:
 
         mort_acc = rng.integers(0, min(3, open_acc) + 1)
         remaining = open_acc - mort_acc
-        revol_accounts = rng.integers(1, remaining + 1)
+        revol_accounts = rng.integers(0, max(remaining + 1, 1))        
         installment_accounts = remaining - revol_accounts
 
         # ---------------- Limits & Utilization ----------------
