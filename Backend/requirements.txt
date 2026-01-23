@@ -45,8 +45,9 @@ catboost==1.2.8
 # ----------------------------
 # Neural network stack (CRITICAL)
 # ----------------------------
-tensorflow==2.15.0
-
+#tensorflow==2.15.0
+tensorflow==2.16.1  # TensorFlow backend for Keras 3
+keras==3.10.0  
 protobuf==3.20.3
 
 # ----------------------------
