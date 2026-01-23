@@ -99,8 +99,14 @@ export default function ApplicationDetail() {
   
   // UPDATED PERMISSION LOGIC:
   // Show Approve if in Manual Review OR (Declined AND Admin)
-  const showApprove = canAct && (isReview || (isDeclined && !isUserDeclined && isAdmin));
   
+  //const showApprove = canAct && (isReview || (isDeclined && !isUserDeclined && isAdmin));
+  const canOverrideDecline = role === 'admin' || role === 'underwriter';
+
+const showApprove =
+  canAct &&
+  (isReview || (isDeclined && !isUserDeclined && canOverrideDecline));
+
   const showDecline = canAct && (isReview || (isAdmin && isOffered));
 
   // --- DRIVERS ---
