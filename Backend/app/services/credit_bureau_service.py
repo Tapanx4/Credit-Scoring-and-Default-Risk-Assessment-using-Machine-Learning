@@ -163,12 +163,12 @@ class CreditBureauService:
             # Counts
             'acc_now_delinq': acc_now_delinq,
             'num_accts_ever_120_pd': rng.binomial(2, 0.08),
-            'num_actv_bc_tl': rng.integers(1, revol_accounts + 1),
+            'num_actv_bc_tl': safe_int(1, revol_accounts + 1),
             'num_actv_rev_tl':       safe_int(1, revol_accounts + 1),
-'num_bc_sats':           safe_int(1, revol_accounts + 1),
-'num_bc_tl':             safe_int(1, revol_accounts + 1),
+            'num_bc_sats':           safe_int(1, revol_accounts + 1),
+            'num_bc_tl':             safe_int(1, revol_accounts + 1),
             'num_il_tl': installment_accounts,
-'num_op_rev_tl':         safe_int(1, revol_accounts + 1),
+            'num_op_rev_tl':         safe_int(1, revol_accounts + 1),
             'num_rev_accts': revol_accounts,
             'num_rev_tl_bal_gt_0': min(
                 revol_accounts,
