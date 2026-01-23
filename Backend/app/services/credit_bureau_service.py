@@ -20,6 +20,8 @@ def clipped_normal(rng, mean, std, low=0, high=None):
     return max(low, x)
 
 
+
+
 MISSING_ELIGIBLE = {
     'mths_since_last_delinq',
     'mths_since_last_record',
@@ -44,7 +46,7 @@ class CreditBureauService:
     Deterministic mock credit bureau generator.
     Same SSN will ALWAYS produce the same bureau report.
     """
-
+    
         
     def pull_report(self, applicant: Dict[str, Any]) -> Dict[str, Any]:
         ssn = applicant.get("ssn")
@@ -59,6 +61,9 @@ class CreditBureauService:
 
     def _generate(self, ssn: str) -> Dict[str, Any]:
         rng = seeded_rng_from_ssn(ssn)
+        def safe_int(low: int, high: int, default: int = 0) -> int:
+    
+            return rng.integers(low, high) if low < high else default
 
         # ---------------- Credit Age ----------------
         credit_age_months = rng.integers(24, 300)
@@ -159,11 +164,11 @@ class CreditBureauService:
             'acc_now_delinq': acc_now_delinq,
             'num_accts_ever_120_pd': rng.binomial(2, 0.08),
             'num_actv_bc_tl': rng.integers(1, revol_accounts + 1),
-            'num_actv_rev_tl': revol_accounts,
-            'num_bc_sats': rng.integers(0, revol_accounts + 1),
-            'num_bc_tl': revol_accounts,
+            'num_actv_rev_tl':       safe_int(1, revol_accounts + 1),
+'num_bc_sats':           safe_int(1, revol_accounts + 1),
+'num_bc_tl':             safe_int(1, revol_accounts + 1),
             'num_il_tl': installment_accounts,
-            'num_op_rev_tl': revol_accounts,
+'num_op_rev_tl':         safe_int(1, revol_accounts + 1),
             'num_rev_accts': revol_accounts,
             'num_rev_tl_bal_gt_0': min(
                 revol_accounts,
@@ -191,10 +196,14 @@ class CreditBureauService:
             'tot_hi_cred_lim': tot_hi_cred_lim,
             'tot_cur_bal': tot_cur_bal,
             'tot_coll_amt': rng.integers(0, 3000),
-            'max_bal_bc': rng.integers(500, total_bc_limit),
+            'max_bal_bc': safe_int(500, total_bc_limit),
             'bc_open_to_buy': maybe_missing(bc_open_to_buy),
             'bc_util': round(revol_util * 100, 1),
-            'percent_bc_gt_75': int(revol_util > 0.75) * rng.integers(20, 100),
+            'percent_bc_gt_75': (
+                safe_int(20, 100)
+                if revol_accounts > 0 and revol_util > 0.75
+                else 0
+            ),
             'all_util': maybe_missing(round((revol_bal + total_bal_il) / max(1, total_bc_limit + total_il_high_credit_limit) * 100, 1)),
             'il_util': maybe_missing(round(total_bal_il / max(1, total_il_high_credit_limit) * 100, 1)),
             'pct_tl_nvr_dlq': maybe_missing(round(rng.uniform(60, 100), 1)),
