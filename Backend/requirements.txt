@@ -64,3 +64,10 @@ python-dotenv==1.0.1
 #supabase==2.3.5
 httpx==0.27.0
 supabase==2.9.0
+
+# ----------------------------
+# Compatibility overrides
+# ----------------------------
+# Loosened to let pip satisfy transitive grpcio requirements
+# from supabase, tensorflow, google-* packages without conflict.
+grpcio>=1.24.3,<2.0
