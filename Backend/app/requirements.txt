@@ -1,1 +1,66 @@
--r ../requirements.txt
+# fastapi>=0.109.0
+# uvicorn>=0.27.0
+# pydantic>=2.6.0
+# pydantic-settings>=2.2.0
+# email-validator>=2.1.0
+# sqlalchemy>=2.0.25
+# alembic>=1.13.1
+# psycopg2-binary>=2.9.9
+# pandas>=2.2.0
+# numpy>=1.26.0
+# catboost>=1.2.2
+# tensorflow>=2.15.0
+# scikit-learn>=1.4.0
+# python-multipart>=0.0.9
+# python-jose[cryptography]>=3.3.0
+# passlib[bcrypt]>=1.7.4
+# supabase>=2.3.0
+# httpx>=0.26.0
+# python-dotenv>=1.0.0
+
+# ----------------------------
+# Core API stack
+# ----------------------------
+fastapi==0.110.0
+uvicorn==0.27.1
+pydantic==2.6.4
+pydantic-settings==2.2.1
+email-validator==2.1.1
+
+# ----------------------------
+# Database & migrations
+# ----------------------------
+sqlalchemy==2.0.25
+alembic==1.13.1
+psycopg2-binary==2.9.9
+
+# ----------------------------
+# Data & ML (PINNED TO TRAINING)
+# ----------------------------
+numpy==1.26.4
+pandas==2.1.4
+scikit-learn==1.6.1
+catboost==1.2.8
+
+# ----------------------------
+# Neural network stack (CRITICAL)
+# ----------------------------
+#tensorflow==2.15.0
+tensorflow==2.16.1  # TensorFlow backend for Keras 3
+keras==3.10.0  
+protobuf==3.20.3
+
+# ----------------------------
+# Auth & security
+# ----------------------------
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+
+# ----------------------------
+# Misc / utilities
+# ----------------------------
+python-multipart==0.0.9
+python-dotenv==1.0.1
+#supabase==2.3.5
+httpx==0.27.0
+supabase==2.9.0
