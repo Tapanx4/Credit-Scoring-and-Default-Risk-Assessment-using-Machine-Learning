@@ -32,7 +32,7 @@ email-validator==2.1.1
 # ----------------------------
 sqlalchemy==2.0.25
 alembic==1.13.1
-psycopg2==2.9.9
+psycopg2-binary==2.9.9
 
 # ----------------------------
 # Data & ML (PINNED TO TRAINING)
